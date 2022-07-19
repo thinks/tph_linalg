@@ -105,8 +105,8 @@
             "configurePreset": "gcc",
             "jobs": 14,
             "targets": [
-                "all",
-                "install"
+                "install",
+                "all"
             ]
         },
         {
@@ -116,6 +116,7 @@
             "configurePreset": "clang",
             "jobs": 14,
             "targets": [
+                "install",
                 "all"
             ]
         },
@@ -124,7 +125,7 @@
             "description": "",
             "displayName": "gcc-ci",
             "configurePreset": "gcc-ci",
-            "jobs": 14,
+            "jobs": 4,
             "targets": [
                 "all"
             ]
@@ -134,82 +135,11 @@
             "description": "",
             "displayName": "clang-ci",
             "configurePreset": "clang-ci",
-            "jobs": 14,
-            "targets": [
-                "all"
-            ]
-        },
-        {
-            "name": "clang-sanitizers",
-            "description": "",
-            "displayName": "clang-sanitizers",
-            "configurePreset": "clang-sanitizers",
-            "jobs": 14,
+            "jobs": 4,
             "targets": [
                 "all"
             ]
         }
     ],
-    "testPresets": [
-        {
-            "name": "gcc",
-            "configurePreset": "gcc",
-            "output": {
-                "outputOnFailure": true
-            },
-            "execution": {
-                "jobs": 14,
-                "noTestsAction": "error",
-                "stopOnFailure": true
-            }
-        },
-        {
-            "name": "clang",
-            "configurePreset": "clang",
-            "output": {
-                "outputOnFailure": true
-            },
-            "execution": {
-                "jobs": 14,
-                "noTestsAction": "error",
-                "stopOnFailure": true
-            }
-        },
-        {
-            "name": "gcc-ci",
-            "configurePreset": "gcc-ci",
-            "output": {
-                "outputOnFailure": true
-            },
-            "execution": {
-                "jobs": 14,
-                "noTestsAction": "error",
-                "stopOnFailure": true
-            }
-        },
-        {
-            "name": "clang-ci",
-            "configurePreset": "clang-ci",
-            "output": {
-                "outputOnFailure": true
-            },
-            "execution": {
-                "jobs": 14,
-                "noTestsAction": "error",
-                "stopOnFailure": true
-            }
-        },
-        {
-            "name": "clang-sanitizers",
-            "configurePreset": "clang-sanitizers",
-            "output": {
-                "outputOnFailure": true
-            },
-            "execution": {
-                "jobs": 14,
-                "noTestsAction": "error",
-                "stopOnFailure": true
-            }
-        }
-    ]
+    "testPresets": []
 }
