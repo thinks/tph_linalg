@@ -1,5 +1,11 @@
 #pragma once
 
+#if __cplusplus >= 201703L
+#define TPH_NODISCARD [[nodiscard]]
+#else
+#define TPH_NODISCARD 
+#endif 
+
 namespace tph {
 template <typename ArithT>
 struct Vec2 {
@@ -30,124 +36,124 @@ using double4 = Vec4<double>;
 
 // operator==(a, b)
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator==(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator==(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
     -> bool {
   return a.x == b.x && a.y == b.y;
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator==(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator==(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
     -> bool {
   return a.x == b.x && a.y == b.y && a.z == b.z;
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator==(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator==(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
     -> bool {
   return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 }
 
 // operator!=(a, b)
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator!=(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) -> bool {
+TPH_NODISCARD constexpr auto operator!=(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) -> bool {
   return !(a == b);
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator!=(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) -> bool {
+TPH_NODISCARD constexpr auto operator!=(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) -> bool {
   return !(a == b);
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator!=(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) -> bool {
+TPH_NODISCARD constexpr auto operator!=(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) -> bool {
   return !(a == b);
 }
 
 // operator+(a, b)
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator+(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator+(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
     -> Vec2<decltype(a.x + b.x)> {
   return {a.x + b.x, a.y + b.y};
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator+(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator+(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
     -> Vec3<decltype(a.x + b.x)> {
   return {a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator+(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator+(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
     -> Vec4<decltype(a.x + b.x)> {
   return {a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w};
 }
 
 // operator-(a, b)
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator-(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator-(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
     -> Vec2<decltype(a.x - b.x)> {
   return {a.x - b.x, a.y - b.y};
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator-(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator-(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
     -> Vec3<decltype(a.x - b.x)> {
   return {a.x - b.x, a.y - b.y, a.z - b.z};
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator-(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator-(const Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
     -> Vec4<decltype(a.x + b.x)> {
   return {a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w};
 }
 
 // operator+=(a, b)
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator+=(Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator+=(Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator+=(Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator+=(Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator+=(Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator+=(Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 // operator-=(a, b)
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator-=(Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator-=(Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator-=(Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator-=(Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto operator-=(Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto operator-=(Vec4<ArithT>& a, const Vec4<ArithT2>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
 
 // Cross product.
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto Cross(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto Cross(const Vec2<ArithT>& a, const Vec2<ArithT2>& b) noexcept
     -> decltype(a.x * b.y - a.y * b.x) {
   return a.x * b.y - a.y * b.x;
 }
 
 template <typename ArithT, typename ArithT2>
-[[nodiscard]] constexpr auto Cross(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
+TPH_NODISCARD constexpr auto Cross(const Vec3<ArithT>& a, const Vec3<ArithT2>& b) noexcept
     -> Vec3<decltype(a.y * b.z - a.z * b.y)> {
   return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
 }
@@ -164,3 +170,5 @@ constexpr vec<T, 2> cross(const vec<T, 2>& a, T b) {
 #endif
 
 } // namespace tph
+
+#undef TPH_NODISCARD
