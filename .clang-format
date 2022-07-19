@@ -1,0 +1,12 @@
+BasedOnStyle: LLVM
+IndentWidth: 2
+UseTab: Never
+BinPackArguments: false
+BinPackParameters: false
+AlwaysBreakTemplateDeclarations: true
+Standard: c++11
+Cpp11BracedListStyle: true
+SortIncludes: true
+IncludeBlocks: Preserve
+PointerAlignment: Left
+ColumnLimit: 100

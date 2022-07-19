@@ -1,0 +1,215 @@
+{
+    "version": 2,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "gcc",
+            "displayName": "gcc",
+            "description": "GCC",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_CXX_STANDARD": "17",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_EXTENSIONS": "OFF",
+                "TPH_BuildTests": "ON",
+                "TPH_Install": "ON"
+            },
+            "environment": {},
+            "vendor": {}
+        },
+        {
+            "name": "clang",
+            "displayName": "clang",
+            "description": "clang",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/install",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_CXX_STANDARD": "17",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_EXTENSIONS": "OFF"
+            },
+            "environment": {},
+            "vendor": {}
+        },
+        {
+            "name": "gcc-ci",
+            "displayName": "gcc-ci",
+            "description": "GCC CI",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_EXTENSIONS": "OFF",
+                "CMAKE_CXX_FLAGS": "-pedantic -Werror --all-warnings --extra-warnings",
+                "TPH_BuildTests": "ON",
+                "TPH_Install": "OFF"
+            },
+            "environment": {},
+            "vendor": {}
+        },
+        {
+            "name": "clang-ci",
+            "displayName": "clang-ci",
+            "description": "clang CI",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_EXTENSIONS": "OFF",
+                "CMAKE_CXX_FLAGS": "-Werror -Weverything",
+                "TPH_BuildTests": "ON",
+                "TPH_Install": "OFF"
+            },
+            "environment": {},
+            "vendor": {}
+        },
+        {
+            "name": "clang-sanitizers",
+            "inherits": "clang",
+            "displayName": "clang-sanitizers",
+            "description": "clang sanitizers",
+            "binaryDir": "${sourceDir}/build",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "TPH_BuildTests": "ON",
+                "CMAKE_CXX_FLAGS": "-g -O1 -fsanitize=address -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -fno-omit-frame-pointer -fno-sanitize-recover=all -fno-sanitize=unsigned-integer-overflow -fno-sanitize=unsigned-shift-base"
+            },
+            "environment": {},
+            "vendor": {}
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "gcc",
+            "description": "",
+            "displayName": "gcc",
+            "configurePreset": "gcc",
+            "jobs": 14,
+            "targets": [
+                "all",
+                "install"
+            ]
+        },
+        {
+            "name": "clang",
+            "description": "",
+            "displayName": "clang",
+            "configurePreset": "clang",
+            "jobs": 14,
+            "targets": [
+                "all"
+            ]
+        },
+        {
+            "name": "gcc-ci",
+            "description": "",
+            "displayName": "gcc-ci",
+            "configurePreset": "gcc-ci",
+            "jobs": 14,
+            "targets": [
+                "all"
+            ]
+        },
+        {
+            "name": "clang-ci",
+            "description": "",
+            "displayName": "clang-ci",
+            "configurePreset": "clang-ci",
+            "jobs": 14,
+            "targets": [
+                "all"
+            ]
+        },
+        {
+            "name": "clang-sanitizers",
+            "description": "",
+            "displayName": "clang-sanitizers",
+            "configurePreset": "clang-sanitizers",
+            "jobs": 14,
+            "targets": [
+                "all"
+            ]
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "gcc",
+            "configurePreset": "gcc",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "jobs": 14,
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "clang",
+            "configurePreset": "clang",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "jobs": 14,
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "gcc-ci",
+            "configurePreset": "gcc-ci",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "jobs": 14,
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "clang-ci",
+            "configurePreset": "clang-ci",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "jobs": 14,
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "clang-sanitizers",
+            "configurePreset": "clang-sanitizers",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "jobs": 14,
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        }
+    ]
+}
