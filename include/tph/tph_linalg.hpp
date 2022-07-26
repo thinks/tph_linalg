@@ -18,8 +18,6 @@ struct Vec<ArithT, 2> {
   ArithT x;
   ArithT y;
 };
-using float2 = Vec<float, 2>;
-using double2 = Vec<double, 2>;
 
 template <typename ArithT>
 struct Vec<ArithT, 3> {
@@ -27,8 +25,6 @@ struct Vec<ArithT, 3> {
   ArithT y;
   ArithT z;
 };
-using float3 = Vec<float, 3>;
-using double3 = Vec<double, 3>;
 
 template <typename ArithT>
 struct Vec<ArithT, 4> {
@@ -37,7 +33,13 @@ struct Vec<ArithT, 4> {
   ArithT z;
   ArithT w;
 };
+
+// Convenient type aliases.
+using float2 = Vec<float, 2>;
+using float3 = Vec<float, 3>;
 using float4 = Vec<float, 4>;
+using double2 = Vec<double, 2>;
+using double3 = Vec<double, 3>;
 using double4 = Vec<double, 4>;
 
 // operator==(a, b)
@@ -76,6 +78,7 @@ TPH_NODISCARD constexpr auto operator!=(const Vec<ArithT, 4>& a, const Vec<Arith
 }
 
 // operator*(vec, scalar)
+// Treat vectors as column vectors (Mx1 matrices).
 template <typename ArithT, typename ArithT2>
 TPH_NODISCARD constexpr auto operator*(const Vec<ArithT, 2>& a, const ArithT2 b) noexcept
     -> Vec<decltype(a.x * b), 2> {
@@ -134,57 +137,66 @@ TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 4>& a, const Vec<ArithT
 
 // operator*=(vec, scalar)
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator*=(Vec<ArithT, 2>& a, const ArithT2 b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator*=(Vec<ArithT, 2>& a, const ArithT2 b) noexcept
     -> decltype(a = a * b) {
   return a = a * b;
 }
 
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator*=(Vec<ArithT, 3>& a, const ArithT2 b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator*=(Vec<ArithT, 3>& a, const ArithT2 b) noexcept
     -> decltype(a = a * b) {
   return a = a * b;
 }
 
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator*=(Vec<ArithT, 4>& a, const ArithT2 b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator*=(Vec<ArithT, 4>& a, const ArithT2 b) noexcept
     -> decltype(a = a * b) {
   return a = a * b;
 }
 
 // operator+=(a, b)
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator+=(Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator+=(Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator+=(Vec<ArithT, 3>& a, const Vec<ArithT2, 3>& b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator+=(Vec<ArithT, 3>& a, const Vec<ArithT2, 3>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator+=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator+=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 // operator-=(a, b)
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator-=(Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
+//TPH_NODISCARD
+constexpr auto operator-=(Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
 
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator-=(Vec<ArithT, 3>& a, const Vec<ArithT2, 3>& b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator-=(Vec<ArithT, 3>& a, const Vec<ArithT2, 3>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
 
 template <typename ArithT, typename ArithT2>
-TPH_NODISCARD constexpr auto operator-=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
+//TPH_NODISCARD 
+constexpr auto operator-=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
@@ -255,8 +267,6 @@ struct Mat<ArithT, M, 2> {
   Vec<ArithT, M> x; // Column 0.
   Vec<ArithT, M> y; // Column 1.
 };
-using float2x2 = Mat<float, 2, 2>;
-using double2x2 = Mat<double, 2, 2>;
 
 template <typename ArithT, int M>
 struct Mat<ArithT, M, 3> {
@@ -264,8 +274,6 @@ struct Mat<ArithT, M, 3> {
   Vec<ArithT, M> y; // Column 1.
   Vec<ArithT, M> z; // Column 2.
 };
-using float3x3 = Mat<float, 3, 3>;
-using double3x3 = Mat<double, 3, 3>;
 
 template <typename ArithT, int M>
 struct Mat<ArithT, M, 4> {
@@ -274,7 +282,19 @@ struct Mat<ArithT, M, 4> {
   Vec<ArithT, M> z; // Column 2.
   Vec<ArithT, M> w; // Column 3.
 };
+
+// Convenient type aliases.
+using float2x2 = Mat<float, 2, 2>;
+using float2x3 = Mat<float, 2, 3>;
+using float3x3 = Mat<float, 3, 3>;
+using float2x4 = Mat<float, 2, 4>;
+using float3x4 = Mat<float, 3, 4>;
 using float4x4 = Mat<float, 4, 4>;
+using double2x2 = Mat<double, 2, 2>;
+using double2x3 = Mat<double, 2, 3>;
+using double3x3 = Mat<double, 3, 3>;
+using double2x4 = Mat<double, 2, 4>;
+using double3x4 = Mat<double, 3, 4>;
 using double4x4 = Mat<double, 4, 4>;
 
 // Construct the matrix:
