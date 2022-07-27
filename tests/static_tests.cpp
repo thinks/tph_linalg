@@ -19,8 +19,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
   constexpr tph::Vec<float, 3> a3{1.0F, 2.0F, 3.0F};
   constexpr tph::Vec<float, 4> a4{1.0F, 2.0F, 3.0F, 4.0F};
   static_assert(a2.x == 1.0F && a2.y == 2.0F, "");
-  static_assert(a3.x == 1.0F && a3.y == 2.0F && a3.z, "");
-  static_assert(a4.x == 1.0F && a4.y == 2.0F && a4.z && a4.w == 4.0F, "");
+  static_assert(a3.x == 1.0F && a3.y == 2.0F && a3.z == 3.0F, "");
+  static_assert(a4.x == 1.0F && a4.y == 2.0F && a4.z == 3.0F && a4.w == 4.0F, "");
 
   // Default initialization.
   {
@@ -63,21 +63,27 @@ int main(int /*argc*/, char* /*argv*/[]) {
 
   // operator*=(vec, scalar)
 #if HAS_CPP17
-  static_assert([]() constexpr {
-    auto a = tph::Vec<float, 2>{1, 2};
-    a *= 2;
-    return a;
-  }() == tph::Vec<float, 2>{2, 4}, "");
-  static_assert([]() constexpr {
-    auto a = tph::Vec<float, 3>{1, 2, 3};
-    a *= 2;
-    return a;
-  }() == tph::Vec<float, 3>{2, 4, 6}, "");
-  static_assert([]() constexpr {
-    auto a = tph::Vec<float, 4>{1, 2, 3, 4};
-    a *= 2;
-    return a;
-  }() == tph::Vec<float, 4>{2, 4, 6, 8}, "");
+  static_assert(
+      []() constexpr {
+        auto a = tph::Vec<float, 2>{1, 2};
+        a *= 2;
+        return a;
+      }() == tph::Vec<float, 2>{2, 4},
+      "");
+  static_assert(
+      []() constexpr {
+        auto a = tph::Vec<float, 3>{1, 2, 3};
+        a *= 2;
+        return a;
+      }() == tph::Vec<float, 3>{2, 4, 6},
+      "");
+  static_assert(
+      []() constexpr {
+        auto a = tph::Vec<float, 4>{1, 2, 3, 4};
+        a *= 2;
+        return a;
+      }() == tph::Vec<float, 4>{2, 4, 6, 8},
+      "");
 #endif
 
   return 0;
