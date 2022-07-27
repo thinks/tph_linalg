@@ -8,6 +8,95 @@
 
 namespace tph {
 
+namespace tph_linalg_internal {
+
+template <typename FloatT>
+struct numeric_limits;
+
+template <>
+struct numeric_limits<float> {
+  TPH_NODISCARD static constexpr auto infinity() noexcept -> float { return __builtin_huge_valf(); }
+  TPH_NODISCARD static constexpr auto min() noexcept -> float { return 1.17549435e-38F; }
+  TPH_NODISCARD static constexpr auto quiet_NaN() noexcept -> float { return __builtin_nanf(""); }
+};
+
+template <>
+struct numeric_limits<double> {
+  TPH_NODISCARD static constexpr auto infinity() noexcept -> double { return __builtin_huge_val(); }
+  TPH_NODISCARD static constexpr auto min() noexcept -> double { return 2.2250738585072016e-308; }
+  TPH_NODISCARD static constexpr auto quiet_NaN() noexcept -> double { return __builtin_nan(""); }
+};
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/is_nan.hpp
+template <typename FloatT>
+TPH_NODISCARD constexpr auto is_nan(const FloatT x) noexcept -> bool {
+  return x != x;
+}
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/is_inf.hpp
+template <typename FloatT>
+TPH_NODISCARD constexpr auto is_posinf(const FloatT x) noexcept -> bool {
+  return x == numeric_limits<FloatT>::infinity();
+}
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/abs.hpp
+template <typename ArithT>
+TPH_NODISCARD constexpr auto abs(const ArithT x) noexcept -> ArithT {
+  return ( // deal with signed-zeros
+      x == ArithT(0) ? ArithT(0) :
+                     // else
+          x < ArithT(0) ? -x
+                        : x);
+}
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/sqrt.hpp
+template <typename FloatT>
+TPH_NODISCARD constexpr auto SqrtRecur(const FloatT x, const FloatT xn, const int count) noexcept
+    -> FloatT {
+  // Max iter from https://github.com/kthohr/gcem/blob/master/include/gcem_incl/gcem_options.hpp,
+  // GCEM_SQRT_MAX_ITER.
+
+  return (abs(xn - x / xn) / (FloatT(1) + xn) < numeric_limits<FloatT>::min()
+              ? // if
+              xn
+              : count < 100 // max iter
+                    ?       // else
+                    SqrtRecur(x, FloatT(0.5) * (xn + x / xn), count + 1)
+                    : xn);
+}
+
+template <typename FloatT>
+TPH_NODISCARD constexpr auto SqrtCheck(const FloatT x, const FloatT m_val) noexcept -> FloatT {
+  return (is_nan(x) ? numeric_limits<FloatT>::quiet_NaN() :
+                    //
+              x < FloatT(0) ? numeric_limits<FloatT>::quiet_NaN()
+                            :
+                            //
+              is_posinf(x) ? x
+                           :
+                           // indistinguishable from zero or one
+              numeric_limits<FloatT>::min() > abs(x)           ? FloatT(0)
+          : numeric_limits<FloatT>::min() > abs(FloatT(1) - x) ? x
+                                                               :
+                                                               // else
+              x > FloatT(4) ? SqrtCheck(x / FloatT(4), FloatT(2) * m_val)
+                            : m_val * SqrtRecur(x, x / FloatT(2), 0));
+}
+
+/**
+ * Compile-time square-root function
+ *
+ * @param x a real-valued input.
+ * @return Computes \f$ \sqrt{x} \f$ using a Newton-Raphson approach.
+ */
+
+template <typename FloatT>
+TPH_NODISCARD constexpr auto sqrt(const FloatT x) noexcept -> FloatT {
+  return SqrtCheck(x, FloatT(1));
+}
+
+} // namespace tph_linalg_internal
+
 // Small, fixed-length vector type, consisting of exactly M elements of type T, and presumed to be a
 // column-vector unless otherwise noted.
 template <typename ArithT, int M>
@@ -137,43 +226,40 @@ TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 4>& a, const Vec<ArithT
 
 // operator*=(vec, scalar)
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
-constexpr auto operator*=(Vec<ArithT, 2>& a, const ArithT2 b) noexcept
-    -> decltype(a = a * b) {
+// TPH_NODISCARD
+constexpr auto operator*=(Vec<ArithT, 2>& a, const ArithT2 b) noexcept -> decltype(a = a * b) {
   return a = a * b;
 }
 
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
-constexpr auto operator*=(Vec<ArithT, 3>& a, const ArithT2 b) noexcept
-    -> decltype(a = a * b) {
+// TPH_NODISCARD
+constexpr auto operator*=(Vec<ArithT, 3>& a, const ArithT2 b) noexcept -> decltype(a = a * b) {
   return a = a * b;
 }
 
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
-constexpr auto operator*=(Vec<ArithT, 4>& a, const ArithT2 b) noexcept
-    -> decltype(a = a * b) {
+// TPH_NODISCARD
+constexpr auto operator*=(Vec<ArithT, 4>& a, const ArithT2 b) noexcept -> decltype(a = a * b) {
   return a = a * b;
 }
 
 // operator+=(a, b)
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
+// TPH_NODISCARD
 constexpr auto operator+=(Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
+// TPH_NODISCARD
 constexpr auto operator+=(Vec<ArithT, 3>& a, const Vec<ArithT2, 3>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
 }
 
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
+// TPH_NODISCARD
 constexpr auto operator+=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
     -> decltype(a = a + b) {
   return a = a + b;
@@ -181,21 +267,21 @@ constexpr auto operator+=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
 
 // operator-=(a, b)
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD
+// TPH_NODISCARD
 constexpr auto operator-=(Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
 
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
+// TPH_NODISCARD
 constexpr auto operator-=(Vec<ArithT, 3>& a, const Vec<ArithT2, 3>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
 }
 
 template <typename ArithT, typename ArithT2>
-//TPH_NODISCARD 
+// TPH_NODISCARD
 constexpr auto operator-=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
@@ -396,17 +482,17 @@ TPH_NODISCARD constexpr auto Identity4x4() noexcept -> Mat<ArithT, 4, 4> {
 
 // Matrix/vector multiplication.
 template <class ArithT, int M>
-constexpr auto Mul(const Mat<ArithT, M, 2>& a, const Vec<ArithT, 2>& b) noexcept -> Vec<ArithT, M>{
+constexpr auto Mul(const Mat<ArithT, M, 2>& a, const Vec<ArithT, 2>& b) noexcept -> Vec<ArithT, M> {
   return a.x * b.x + a.y * b.y;
 }
 
 template <class ArithT, int M>
-constexpr auto Mul(const Mat<ArithT, M, 3>& a, const Vec<ArithT, 3>& b) noexcept -> Vec<ArithT, M>{
+constexpr auto Mul(const Mat<ArithT, M, 3>& a, const Vec<ArithT, 3>& b) noexcept -> Vec<ArithT, M> {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 template <class ArithT, int M>
-constexpr auto Mul(const Mat<ArithT, M, 4>& a, const Vec<ArithT, 4>& b) noexcept -> Vec<ArithT, M>{
+constexpr auto Mul(const Mat<ArithT, M, 4>& a, const Vec<ArithT, 4>& b) noexcept -> Vec<ArithT, M> {
   return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
 
