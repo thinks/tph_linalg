@@ -60,17 +60,17 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(a4 - b4 == tph::Vec<float, 4>{-4, -4, -4, -4}, "");
 
   // operator*=(vec, scalar)
-  static_assert([]() {
+  static_assert([]() constexpr {
     auto a = tph::Vec<float, 2>{1, 2};
     a *= 2;
     return a;
   }() == tph::Vec<float, 2>{2, 4}, "");
-  static_assert([]() {
+  static_assert([]() constexpr {
     auto a = tph::Vec<float, 3>{1, 2, 3};
     a *= 2;
     return a;
   }() == tph::Vec<float, 3>{2, 4, 6}, "");
-  static_assert([]() {
+  static_assert([]() constexpr {
     auto a = tph::Vec<float, 4>{1, 2, 3, 4};
     a *= 2;
     return a;
