@@ -1,6 +1,6 @@
 #pragma once
 
-#if __cplusplus >= 201703L
+#if __cplusplus >= 201703L // C++17
 #define TPH_NODISCARD [[nodiscard]]
 #else
 #define TPH_NODISCARD

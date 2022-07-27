@@ -7,6 +7,8 @@
 
 #include <tph/tph_linalg.hpp>
 
+#define HAS_CPP17 (__cplusplus >= 201703L)
+
 int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(sizeof(tph::Vec<float, 2>) == 2 * sizeof(float), "");
   static_assert(sizeof(tph::Vec<float, 3>) == 3 * sizeof(float), "");
@@ -60,6 +62,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(a4 - b4 == tph::Vec<float, 4>{-4, -4, -4, -4}, "");
 
   // operator*=(vec, scalar)
+#if HAS_CPP17
   static_assert([]() constexpr {
     auto a = tph::Vec<float, 2>{1, 2};
     a *= 2;
@@ -75,6 +78,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
     a *= 2;
     return a;
   }() == tph::Vec<float, 4>{2, 4, 6, 8}, "");
+#endif
 
   return 0;
 }
