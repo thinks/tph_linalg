@@ -16,7 +16,7 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/install",
                 "CMAKE_CXX_COMPILER": "g++",
-                "CMAKE_CXX_STANDARD": "17",
+                "CMAKE_CXX_STANDARD": "20",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON",
                 "CMAKE_CXX_EXTENSIONS": "OFF",
                 "TPH_BuildTests": "ON",
@@ -35,7 +35,7 @@
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/install",
                 "CMAKE_CXX_COMPILER": "clang++",
-                "CMAKE_CXX_STANDARD": "17",
+                "CMAKE_CXX_STANDARD": "20",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON",
                 "CMAKE_CXX_EXTENSIONS": "OFF"
             },
