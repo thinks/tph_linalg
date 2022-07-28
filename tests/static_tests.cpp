@@ -9,6 +9,42 @@
 
 #define HAS_CPP17 (__cplusplus >= 201703L)
 
+#if 0
+template <typename ArithT, typename ArithT2>
+static constexpr auto MulEq(const ArithT x, const ArithT y, const ArithT2 a) noexcept
+    -> tph::Vec<decltype(x * a), 2> {
+  auto b = tph::Vec<ArithT, 2>{x, y};
+  b *= a;
+  return b;
+}
+
+template <typename ArithT, typename ArithT2>
+static constexpr auto
+MulEq(const ArithT x, const ArithT y, const ArithT z, const ArithT2 a) noexcept
+    -> tph::Vec<decltype(x * a), 3> {
+  auto b = tph::Vec<ArithT, 3>{x, y, z};
+  b *= a;
+  return b;
+}
+
+template <typename ArithT, typename ArithT2>
+static constexpr auto
+MulEq(const ArithT x, const ArithT y, const ArithT z, const ArithT w, const ArithT2 a) noexcept
+    -> tph::Vec<decltype(x * a), 4> {
+  auto b = tph::Vec<ArithT, 4>{x, y, z, w};
+  b *= a;
+  return b;
+}
+#endif
+
+template <typename ArithT, typename ArithT2, int M>
+static constexpr auto MulEq(const tph::Vec<ArithT, M>& a, const ArithT2 b) noexcept
+    -> decltype(a * b) {
+  auto c = a;
+  c *= b;
+  return c;
+}
+
 int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(sizeof(tph::Vec<float, 2>) == 2 * sizeof(float), "");
   static_assert(sizeof(tph::Vec<float, 3>) == 3 * sizeof(float), "");
@@ -62,23 +98,28 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(a4 - b4 == tph::Vec<float, 4>{-4, -4, -4, -4}, "");
 
   // operator*=(vec, scalar)
+  static_assert(MulEq(tph::Vec<float, 2>{1, 2}, 2) == tph::Vec<float, 2>{2, 4}, "");
+  static_assert(MulEq(tph::Vec<float, 3>{1, 2, 3}, 2) == tph::Vec<float, 3>{2, 4, 6}, "");
+  static_assert(MulEq(tph::Vec<float, 4>{1, 2, 3, 4}, 2) == tph::Vec<float, 4>{2, 4, 6, 8}, "");
+
+  // TODO(tohi): Need a solution for testing cpp < 17
 #if HAS_CPP17
   static_assert(
-      []() constexpr {
+      []() {
         auto a = tph::Vec<float, 2>{1, 2};
         a *= 2;
         return a;
       }() == tph::Vec<float, 2>{2, 4},
       "");
   static_assert(
-      []() constexpr {
+      []() {
         auto a = tph::Vec<float, 3>{1, 2, 3};
         a *= 2;
         return a;
       }() == tph::Vec<float, 3>{2, 4, 6},
       "");
   static_assert(
-      []() constexpr {
+      []() {
         auto a = tph::Vec<float, 4>{1, 2, 3, 4};
         a *= 2;
         return a;

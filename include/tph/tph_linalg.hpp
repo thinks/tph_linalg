@@ -1,101 +1,12 @@
 #pragma once
 
-#if __cplusplus >= 201703L // C++17
+#if __cplusplus >= 201703L // C++17 or later.
 #define TPH_NODISCARD [[nodiscard]]
 #else
 #define TPH_NODISCARD
 #endif
 
 namespace tph {
-
-namespace tph_linalg_internal {
-
-template <typename FloatT>
-struct numeric_limits;
-
-template <>
-struct numeric_limits<float> {
-  TPH_NODISCARD static constexpr auto infinity() noexcept -> float { return __builtin_huge_valf(); }
-  TPH_NODISCARD static constexpr auto min() noexcept -> float { return 1.17549435e-38F; }
-  TPH_NODISCARD static constexpr auto quiet_NaN() noexcept -> float { return __builtin_nanf(""); }
-};
-
-template <>
-struct numeric_limits<double> {
-  TPH_NODISCARD static constexpr auto infinity() noexcept -> double { return __builtin_huge_val(); }
-  TPH_NODISCARD static constexpr auto min() noexcept -> double { return 2.2250738585072016e-308; }
-  TPH_NODISCARD static constexpr auto quiet_NaN() noexcept -> double { return __builtin_nan(""); }
-};
-
-// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/is_nan.hpp
-template <typename FloatT>
-TPH_NODISCARD constexpr auto is_nan(const FloatT x) noexcept -> bool {
-  return x != x;
-}
-
-// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/is_inf.hpp
-template <typename FloatT>
-TPH_NODISCARD constexpr auto is_posinf(const FloatT x) noexcept -> bool {
-  return x == numeric_limits<FloatT>::infinity();
-}
-
-// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/abs.hpp
-template <typename ArithT>
-TPH_NODISCARD constexpr auto abs(const ArithT x) noexcept -> ArithT {
-  return ( // deal with signed-zeros
-      x == ArithT(0) ? ArithT(0) :
-                     // else
-          x < ArithT(0) ? -x
-                        : x);
-}
-
-// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/sqrt.hpp
-template <typename FloatT>
-TPH_NODISCARD constexpr auto SqrtRecur(const FloatT x, const FloatT xn, const int count) noexcept
-    -> FloatT {
-  // Max iter from https://github.com/kthohr/gcem/blob/master/include/gcem_incl/gcem_options.hpp,
-  // GCEM_SQRT_MAX_ITER.
-
-  return (abs(xn - x / xn) / (FloatT(1) + xn) < numeric_limits<FloatT>::min()
-              ? // if
-              xn
-              : count < 100 // max iter
-                    ?       // else
-                    SqrtRecur(x, FloatT(0.5) * (xn + x / xn), count + 1)
-                    : xn);
-}
-
-template <typename FloatT>
-TPH_NODISCARD constexpr auto SqrtCheck(const FloatT x, const FloatT m_val) noexcept -> FloatT {
-  return (is_nan(x) ? numeric_limits<FloatT>::quiet_NaN() :
-                    //
-              x < FloatT(0) ? numeric_limits<FloatT>::quiet_NaN()
-                            :
-                            //
-              is_posinf(x) ? x
-                           :
-                           // indistinguishable from zero or one
-              numeric_limits<FloatT>::min() > abs(x)           ? FloatT(0)
-          : numeric_limits<FloatT>::min() > abs(FloatT(1) - x) ? x
-                                                               :
-                                                               // else
-              x > FloatT(4) ? SqrtCheck(x / FloatT(4), FloatT(2) * m_val)
-                            : m_val * SqrtRecur(x, x / FloatT(2), 0));
-}
-
-/**
- * Compile-time square-root function
- *
- * @param x a real-valued input.
- * @return Computes \f$ \sqrt{x} \f$ using a Newton-Raphson approach.
- */
-
-template <typename FloatT>
-TPH_NODISCARD constexpr auto sqrt(const FloatT x) noexcept -> FloatT {
-  return SqrtCheck(x, FloatT(1));
-}
-
-} // namespace tph_linalg_internal
 
 // Small, fixed-length vector type, consisting of exactly M elements of type T, and presumed to be a
 // column-vector unless otherwise noted.
@@ -287,6 +198,90 @@ constexpr auto operator-=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
   return a = a - b;
 }
 
+namespace tph_linalg_internal {
+
+template <typename FloatT>
+struct numeric_limits;
+
+template <>
+struct numeric_limits<float> {
+  TPH_NODISCARD static constexpr auto infinity() noexcept -> float { return __builtin_huge_valf(); }
+  TPH_NODISCARD static constexpr auto min() noexcept -> float { return 1.17549435e-38F; }
+  TPH_NODISCARD static constexpr auto quiet_NaN() noexcept -> float { return __builtin_nanf(""); }
+};
+
+template <>
+struct numeric_limits<double> {
+  TPH_NODISCARD static constexpr auto infinity() noexcept -> double { return __builtin_huge_val(); }
+  TPH_NODISCARD static constexpr auto min() noexcept -> double { return 2.2250738585072016e-308; }
+  TPH_NODISCARD static constexpr auto quiet_NaN() noexcept -> double { return __builtin_nan(""); }
+};
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/is_nan.hpp
+template <typename FloatT>
+TPH_NODISCARD constexpr auto is_nan(const FloatT x) noexcept -> bool {
+  return x != x;
+}
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/is_inf.hpp
+template <typename FloatT>
+TPH_NODISCARD constexpr auto is_posinf(const FloatT x) noexcept -> bool {
+  return x == numeric_limits<FloatT>::infinity();
+}
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/abs.hpp
+template <typename ArithT>
+TPH_NODISCARD constexpr auto abs(const ArithT x) noexcept -> ArithT {
+  return ( // deal with signed-zeros
+      x == ArithT(0) ? ArithT(0) :
+                     // else
+          x < ArithT(0) ? -x
+                        : x);
+}
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/sqrt.hpp
+template <typename FloatT>
+TPH_NODISCARD constexpr auto SqrtRecur(const FloatT x, const FloatT xn, const int count) noexcept
+    -> FloatT {
+  // Max iter from https://github.com/kthohr/gcem/blob/master/include/gcem_incl/gcem_options.hpp,
+  // GCEM_SQRT_MAX_ITER.
+
+  return (abs(xn - x / xn) / (FloatT(1) + xn) < numeric_limits<FloatT>::min()
+              ? // if
+              xn
+              : count < 100 // max iter
+                    ?       // else
+                    SqrtRecur(x, FloatT(0.5) * (xn + x / xn), count + 1)
+                    : xn);
+}
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/sqrt.hpp
+template <typename FloatT>
+TPH_NODISCARD constexpr auto SqrtCheck(const FloatT x, const FloatT m_val) noexcept -> FloatT {
+  return (is_nan(x) ? numeric_limits<FloatT>::quiet_NaN() :
+                    //
+              x < FloatT(0) ? numeric_limits<FloatT>::quiet_NaN()
+                            :
+                            //
+              is_posinf(x) ? x
+                           :
+                           // indistinguishable from zero or one
+              numeric_limits<FloatT>::min() > abs(x)           ? FloatT(0)
+          : numeric_limits<FloatT>::min() > abs(FloatT(1) - x) ? x
+                                                               :
+                                                               // else
+              x > FloatT(4) ? SqrtCheck(x / FloatT(4), FloatT(2) * m_val)
+                            : m_val * SqrtRecur(x, x / FloatT(2), 0));
+}
+
+// Computes sqrt(x) using a Newton-Raphson approach.
+template <typename FloatT>
+TPH_NODISCARD constexpr auto sqrt(const FloatT x) noexcept -> FloatT {
+  return SqrtCheck(x, FloatT(1));
+}
+
+} // namespace tph_linalg_internal
+
 // Cross product.
 template <typename ArithT, typename ArithT2>
 TPH_NODISCARD constexpr auto Cross(const Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
@@ -320,28 +315,38 @@ TPH_NODISCARD constexpr auto Dot(const Vec<ArithT, 4>& a, const Vec<ArithT2, 4>&
 }
 
 // Length squared.
-template <typename VecT>
-TPH_NODISCARD constexpr auto Length2(const VecT& a) noexcept -> decltype(Dot(a, a)) {
+template <typename ArithT, int M>
+TPH_NODISCARD constexpr auto Length2(const Vec<ArithT, M>& a) noexcept -> decltype(Dot(a, a)) {
   return Dot(a, a);
 }
 
+// Length/magnitude.
+template <typename FloatT, int M>
+TPH_NODISCARD constexpr auto Length(const Vec<FloatT, M>& a) noexcept
+    -> decltype(tph_linalg_internal::sqrt(Length2(a))) {
+  return tph_linalg_internal::sqrt(Length2(a));
+}
+
 // Distance squared.
-template <typename VecT, typename VecT2>
-TPH_NODISCARD constexpr auto Distance2(const VecT& a, const VecT2& b) noexcept
+template <typename ArithT, typename ArithT2, int M>
+TPH_NODISCARD constexpr auto Distance2(const Vec<ArithT, M>& a, const Vec<ArithT2, M>& b) noexcept
     -> decltype(Length2(b - a)) {
   return Length2(b - a);
 }
 
-#if 0
-template <class T, int M>
-vec<T, M> normalize(const vec<T, M>& a) {
-  return a / length(a);
+// Distance.
+template <typename FloatT, typename FloatT2, int M>
+TPH_NODISCARD constexpr auto Distance(const Vec<FloatT, M>& a, const Vec<FloatT2, M>& b) noexcept
+    -> decltype(Length(b - a)) {
+  return Length(b - a);
 }
-template <class T, int M>
-T distance(const vec<T, M>& a, const vec<T, M>& b) {
-  return length(b - a);
+
+// Normalized.
+template <typename FloatT, int M>
+TPH_NODISCARD constexpr auto Normalized(const Vec<FloatT, M>& a) noexcept
+    -> Vec<decltype(a.x * (FloatT(1) / Length(a))), M> {
+  return a * (FloatT(1) / Length(a));
 }
-#endif
 
 // Small, fixed-size matrix type, consisting of exactly M rows and N columns of type T, stored in
 // column-major order.
