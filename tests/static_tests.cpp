@@ -82,11 +82,9 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(tph::Distance2(a3, b3) == 27.0F, "");
   static_assert(tph::Distance2(a4, b4) == 64.0F, "");
 
-#ifndef __clang__
 #if HAS_CPP20 // Need constexpr std::sqrt.
+#ifndef __clang__
   // Length.
-  constexpr auto a = std::sqrt(5.0F);
-
   static_assert(std::abs(tph::Length(a2) - std::sqrt(5.0F)) < 1e-6F, "");
   static_assert(std::abs(tph::Length(a3) - std::sqrt(14.0F)) < 1e-6F, "");
   static_assert(std::abs(tph::Length(a4) - std::sqrt(30.0F)) < 1e-6F, "");
@@ -95,8 +93,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(std::abs(tph::Distance(a2, b2) - std::sqrt(8.0F)) < 1e-6F, "");
   static_assert(std::abs(tph::Distance(a3, b3) - std::sqrt(27.0F)) < 1e-6F, "");
   static_assert(std::abs(tph::Distance(a4, b4) - std::sqrt(64.0F)) < 1e-6F, "");
-#endif // HAS_CPP20
 #endif // __clang__
+#endif // HAS_CPP20
 
 #if HAS_CPP17 // Need lambdas to be implicitly constexpr.
   // operator*=(vec, scalar)
