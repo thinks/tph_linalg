@@ -2,48 +2,13 @@
 // This file is subject to the license terms in the LICENSE file
 // found in the top-level directory of this distribution.
 
-#include <functional>
+#include <cmath> // std::sqrt
 #include <type_traits>
 
 #include <tph/tph_linalg.hpp>
 
 #define HAS_CPP17 (__cplusplus >= 201703L)
-
-#if 0
-template <typename ArithT, typename ArithT2>
-static constexpr auto MulEq(const ArithT x, const ArithT y, const ArithT2 a) noexcept
-    -> tph::Vec<decltype(x * a), 2> {
-  auto b = tph::Vec<ArithT, 2>{x, y};
-  b *= a;
-  return b;
-}
-
-template <typename ArithT, typename ArithT2>
-static constexpr auto
-MulEq(const ArithT x, const ArithT y, const ArithT z, const ArithT2 a) noexcept
-    -> tph::Vec<decltype(x * a), 3> {
-  auto b = tph::Vec<ArithT, 3>{x, y, z};
-  b *= a;
-  return b;
-}
-
-template <typename ArithT, typename ArithT2>
-static constexpr auto
-MulEq(const ArithT x, const ArithT y, const ArithT z, const ArithT w, const ArithT2 a) noexcept
-    -> tph::Vec<decltype(x * a), 4> {
-  auto b = tph::Vec<ArithT, 4>{x, y, z, w};
-  b *= a;
-  return b;
-}
-#endif
-
-template <typename ArithT, typename ArithT2, int M>
-static constexpr auto MulEq(const tph::Vec<ArithT, M>& a, const ArithT2 b) noexcept
-    -> decltype(a * b) {
-  auto c = a;
-  c *= b;
-  return c;
-}
+#define HAS_CPP20 (__cplusplus >= 202002L)
 
 int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(sizeof(tph::Vec<float, 2>) == 2 * sizeof(float), "");
@@ -97,13 +62,40 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(a3 - b3 == tph::Vec<float, 3>{-3, -3, -3}, "");
   static_assert(a4 - b4 == tph::Vec<float, 4>{-4, -4, -4, -4}, "");
 
-  // operator*=(vec, scalar)
-  static_assert(MulEq(tph::Vec<float, 2>{1, 2}, 2) == tph::Vec<float, 2>{2, 4}, "");
-  static_assert(MulEq(tph::Vec<float, 3>{1, 2, 3}, 2) == tph::Vec<float, 3>{2, 4, 6}, "");
-  static_assert(MulEq(tph::Vec<float, 4>{1, 2, 3, 4}, 2) == tph::Vec<float, 4>{2, 4, 6, 8}, "");
+  // operator-(a)
+  static_assert(-a2 == tph::Vec<float, 2>{-1.0F, -2.0F}, "");
+  static_assert(-a3 == tph::Vec<float, 3>{-1.0F, -2.0F, -3.0F}, "");
+  static_assert(-a4 == tph::Vec<float, 4>{-1.0F, -2.0F, -3.0F, -4.0F}, "");
 
-  // TODO(tohi): Need a solution for testing cpp < 17
-#if HAS_CPP17
+  // Dot product.
+  static_assert(tph::Dot(a2, b2) == 11.0F, "");
+  static_assert(tph::Dot(a3, b3) == 32.0F, "");
+  static_assert(tph::Dot(a4, b4) == 70.0F, "");
+
+  // Length squared.
+  static_assert(tph::Length2(a2) == 5.0F, "");
+  static_assert(tph::Length2(a3) == 14.0F, "");
+  static_assert(tph::Length2(a4) == 30.0F, "");
+
+  // Distance squared.
+  static_assert(tph::Distance2(a2, b2) == 8.0F, "");
+  static_assert(tph::Distance2(a3, b3) == 27.0F, "");
+  static_assert(tph::Distance2(a4, b4) == 64.0F, "");
+
+#if HAS_CPP20 // Need constexpr std::sqrt.
+  // Length.
+  static_assert(std::abs(tph::Length(a2) - std::sqrt(5.0F)) < 1e-6F, "");
+  static_assert(std::abs(tph::Length(a3) - std::sqrt(14.0F)) < 1e-6F, "");
+  static_assert(std::abs(tph::Length(a4) - std::sqrt(30.0F)) < 1e-6F, "");
+
+  // Distance.
+  static_assert(std::abs(tph::Distance(a2, b2) - std::sqrt(8.0F)) < 1e-6F, "");
+  static_assert(std::abs(tph::Distance(a3, b3) - std::sqrt(27.0F)) < 1e-6F, "");
+  static_assert(std::abs(tph::Distance(a4, b4) - std::sqrt(64.0F)) < 1e-6F, "");
+#endif
+
+#if HAS_CPP17 // Need lambdas to be implicitly constexpr.
+  // operator*=(vec, scalar)
   static_assert(
       []() {
         auto a = tph::Vec<float, 2>{1, 2};
@@ -125,7 +117,54 @@ int main(int /*argc*/, char* /*argv*/[]) {
         return a;
       }() == tph::Vec<float, 4>{2, 4, 6, 8},
       "");
-#endif
+
+  // operator+=(vec, vec)
+  static_assert(
+      []() {
+        auto a = tph::Vec<float, 2>{1, 2};
+        a += tph::Vec<int, 2>{2, 2};
+        return a;
+      }() == tph::Vec<float, 2>{3, 4},
+      "");
+  static_assert(
+      []() {
+        auto a = tph::Vec<float, 3>{1, 2, 3};
+        a += tph::Vec<int, 3>{2, 2, 2};
+        return a;
+      }() == tph::Vec<float, 3>{3, 4, 5},
+      "");
+  static_assert(
+      []() {
+        auto a = tph::Vec<float, 4>{1, 2, 3, 4};
+        a += tph::Vec<int, 4>{2, 2, 2, 2};
+        return a;
+      }() == tph::Vec<float, 4>{3, 4, 5, 6},
+      "");
+
+  // operator-=(vec, vec)
+  static_assert(
+      []() {
+        auto a = tph::Vec<float, 2>{1, 2};
+        a -= tph::Vec<int, 2>{2, 2};
+        return a;
+      }() == tph::Vec<float, 2>{-1, 0},
+      "");
+  static_assert(
+      []() {
+        auto a = tph::Vec<float, 3>{1, 2, 3};
+        a -= tph::Vec<int, 3>{2, 2, 2};
+        return a;
+      }() == tph::Vec<float, 3>{-1, 0, 1},
+      "");
+  static_assert(
+      []() {
+        auto a = tph::Vec<float, 4>{1, 2, 3, 4};
+        a -= tph::Vec<int, 4>{2, 2, 2, 2};
+        return a;
+      }() == tph::Vec<float, 4>{-1, 0, 1, 2},
+      "");
+
+#endif // HAS_CPP17
 
   return 0;
 }

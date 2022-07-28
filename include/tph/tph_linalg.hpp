@@ -198,6 +198,22 @@ constexpr auto operator-=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
   return a = a - b;
 }
 
+// operator-(a), unary negation.
+template <typename ArithT>
+TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 2>& a) noexcept -> Vec<decltype(-a.x), 2> {
+  return {-a.x, -a.y};
+}
+
+template <typename ArithT>
+TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 3>& a) noexcept -> Vec<decltype(-a.x), 3> {
+  return {-a.x, -a.y, -a.z};
+}
+
+template <typename ArithT>
+TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 4>& a) noexcept -> Vec<decltype(-a.x), 4> {
+  return {-a.x, -a.y, -a.z, -a.w};
+}
+
 namespace tph_linalg_internal {
 
 template <typename FloatT>
