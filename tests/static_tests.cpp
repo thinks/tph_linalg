@@ -103,7 +103,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   {
     constexpr auto kSqrt5 = 2.236067977F;
     constexpr auto kSqrt14 = 3.7416573867;
-    constexpr auto kSqrt30 = 5.4772255750;
+    constexpr auto kSqrt30 = 5.4772255750F;
     static_assert(ce_abs(tph::Length(a2) - kSqrt5) < 1e-6F, "");
     static_assert(ce_abs(tph::Length(a3) - kSqrt14) < 1e-6F, "");
     static_assert(ce_abs(tph::Length(a4) - kSqrt30) < 1e-6F, "");
@@ -111,8 +111,8 @@ int main(int /*argc*/, char* /*argv*/[]) {
 
   // Distance.
   {
-    constexpr auto kSqrt8 = 2.8284271247;
-    constexpr auto kSqrt27 = 5.1961524227;
+    constexpr auto kSqrt8 = 2.8284271247F;
+    constexpr auto kSqrt27 = 5.1961524227F;
     constexpr auto kSqrt64 = 8.0F;
     static_assert(ce_abs(tph::Distance(a2, b2) - kSqrt8) < 1e-6F, "");
     static_assert(ce_abs(tph::Distance(a3, b3) - kSqrt27) < 1e-6F, "");
