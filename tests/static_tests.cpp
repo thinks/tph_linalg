@@ -8,7 +8,17 @@
 #include <tph/tph_linalg.hpp>
 
 #define HAS_CPP17 (__cplusplus >= 201703L)
-#define HAS_CPP20 (__cplusplus >= 202002L)
+//#define HAS_CPP20 (__cplusplus >= 202002L)
+
+// From: https://github.com/kthohr/gcem/blob/master/include/gcem_incl/abs.hpp
+template <typename ArithT>
+static constexpr auto ce_abs(const ArithT x) noexcept -> ArithT {
+  return ( // deal with signed-zeros
+      x == ArithT(0) ? ArithT(0) :
+                     // else
+          x < ArithT(0) ? -x
+                        : x);
+}
 
 int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(sizeof(tph::Vec<float, 2>) == 2 * sizeof(float), "");
@@ -82,19 +92,34 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(tph::Distance2(a3, b3) == 27.0F, "");
   static_assert(tph::Distance2(a4, b4) == 64.0F, "");
 
-#if HAS_CPP20 // Need constexpr std::sqrt.
-#ifndef __clang__
+//#if HAS_CPP20 // Need constexpr std::sqrt.
+//#ifndef __clang__
+  // Use pre-computed sqrt-values, issues with clang not supporting
+  // constexpr std::sqrt when linking to libstdc++...
+  //
+  // Also, std::sqrt is only constexpr from C++20 and onward...
+
   // Length.
-  static_assert(std::abs(tph::Length(a2) - std::sqrt(5.0F)) < 1e-6F, "");
-  static_assert(std::abs(tph::Length(a3) - std::sqrt(14.0F)) < 1e-6F, "");
-  static_assert(std::abs(tph::Length(a4) - std::sqrt(30.0F)) < 1e-6F, "");
+  {
+    constexpr auto kSqrt5 = 2.236067977F;
+    constexpr auto kSqrt14 = 3.7416573867;
+    constexpr auto kSqrt30 = 5.4772255750;
+    static_assert(ce_abs(tph::Length(a2) - kSqrt5) < 1e-6F, "");
+    static_assert(ce_abs(tph::Length(a3) - kSqrt14) < 1e-6F, "");
+    static_assert(ce_abs(tph::Length(a4) - kSqrt30) < 1e-6F, "");
+  }
 
   // Distance.
-  static_assert(std::abs(tph::Distance(a2, b2) - std::sqrt(8.0F)) < 1e-6F, "");
-  static_assert(std::abs(tph::Distance(a3, b3) - std::sqrt(27.0F)) < 1e-6F, "");
-  static_assert(std::abs(tph::Distance(a4, b4) - std::sqrt(64.0F)) < 1e-6F, "");
-#endif // __clang__
-#endif // HAS_CPP20
+  {
+    constexpr auto kSqrt8 = 2.8284271247;
+    constexpr auto kSqrt27 = 5.1961524227;
+    constexpr auto kSqrt64 = 8.0F;
+    static_assert(ce_abs(tph::Distance(a2, b2) - kSqrt8) < 1e-6F, "");
+    static_assert(ce_abs(tph::Distance(a3, b3) - kSqrt27) < 1e-6F, "");
+    static_assert(ce_abs(tph::Distance(a4, b4) - kSqrt64) < 1e-6F, "");
+  }
+//#endif // __clang__
+//#endif // HAS_CPP20
 
 #if HAS_CPP17 // Need lambdas to be implicitly constexpr.
   // operator*=(vec, scalar)
