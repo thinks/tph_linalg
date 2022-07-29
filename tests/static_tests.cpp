@@ -92,8 +92,6 @@ int main(int /*argc*/, char* /*argv*/[]) {
   static_assert(tph::Distance2(a3, b3) == 27.0F, "");
   static_assert(tph::Distance2(a4, b4) == 64.0F, "");
 
-//#if HAS_CPP20 // Need constexpr std::sqrt.
-//#ifndef __clang__
   // Use pre-computed sqrt-values, issues with clang not supporting
   // constexpr std::sqrt when linking to libstdc++...
   //
@@ -118,8 +116,13 @@ int main(int /*argc*/, char* /*argv*/[]) {
     static_assert(ce_abs(tph::Distance(a3, b3) - kSqrt27) < 1e-6F, "");
     static_assert(ce_abs(tph::Distance(a4, b4) - kSqrt64) < 1e-6F, "");
   }
-//#endif // __clang__
-//#endif // HAS_CPP20
+
+  // Normalized.
+  {
+    static_assert(tph::Normalized(a2) == (a2 * (1.0F / tph::Length(a2))), "");
+    static_assert(tph::Normalized(a3) == (a3 * (1.0F / tph::Length(a3))), "");
+    static_assert(tph::Normalized(a4) == (a4 * (1.0F / tph::Length(a4))), "");
+  }
 
 #if HAS_CPP17 // Need lambdas to be implicitly constexpr.
   // operator*=(vec, scalar)
