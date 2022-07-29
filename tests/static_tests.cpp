@@ -102,7 +102,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   // Length.
   {
     constexpr auto kSqrt5 = 2.236067977F;
-    constexpr auto kSqrt14 = 3.7416573867;
+    constexpr auto kSqrt14 = 3.7416573867F;
     constexpr auto kSqrt30 = 5.4772255750F;
     static_assert(ce_abs(tph::Length(a2) - kSqrt5) < 1e-6F, "");
     static_assert(ce_abs(tph::Length(a3) - kSqrt14) < 1e-6F, "");
