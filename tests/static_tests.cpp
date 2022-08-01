@@ -193,7 +193,6 @@ int main(int /*argc*/, char* /*argv*/[]) {
         return a;
       }() == tph::Vec<float, 4>{-1, 0, 1, 2},
       "");
-
 #endif // HAS_CPP17
 
   return 0;

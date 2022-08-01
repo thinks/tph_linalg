@@ -42,6 +42,26 @@ using double2 = Vec<double, 2>;
 using double3 = Vec<double, 3>;
 using double4 = Vec<double, 4>;
 
+namespace tph_linalg_internal {
+template <class T>
+struct dependent_false {
+  static constexpr bool value = false;
+};
+} // namespace tph_linalg_internal
+
+template <typename ArithT, int M>
+TPH_NODISCARD constexpr auto Comp(const Vec<ArithT, M>& a, const int i) noexcept -> decltype(a.x) {
+  if constexpr (M == 2) {
+    return i == 0 ? a.x : a.y;
+  } else if constexpr (M == 3) {
+    return i == 0 ? a.x : i == 1 ? a.y : a.z;
+  } else if constexpr (M == 4) {
+    return i == 0 ? a.x : i == 1 ? a.y : i == 2 ? a.z : a.w;
+  } else {
+    static_assert(tph_linalg_internal::dependent_false<ArithT>::value, "");
+  }
+}
+
 // operator==(a, b)
 template <typename ArithT, typename ArithT2>
 TPH_NODISCARD constexpr auto operator==(const Vec<ArithT, 2>& a, const Vec<ArithT2, 2>& b) noexcept
@@ -135,6 +155,22 @@ TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 4>& a, const Vec<ArithT
   return {a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w};
 }
 
+// operator-(a), unary negation.
+template <typename ArithT>
+TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 2>& a) noexcept -> Vec<decltype(-a.x), 2> {
+  return {-a.x, -a.y};
+}
+
+template <typename ArithT>
+TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 3>& a) noexcept -> Vec<decltype(-a.x), 3> {
+  return {-a.x, -a.y, -a.z};
+}
+
+template <typename ArithT>
+TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 4>& a) noexcept -> Vec<decltype(-a.x), 4> {
+  return {-a.x, -a.y, -a.z, -a.w};
+}
+
 // operator*=(vec, scalar)
 template <typename ArithT, typename ArithT2>
 // TPH_NODISCARD
@@ -196,22 +232,6 @@ template <typename ArithT, typename ArithT2>
 constexpr auto operator-=(Vec<ArithT, 4>& a, const Vec<ArithT2, 4>& b) noexcept
     -> decltype(a = a - b) {
   return a = a - b;
-}
-
-// operator-(a), unary negation.
-template <typename ArithT>
-TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 2>& a) noexcept -> Vec<decltype(-a.x), 2> {
-  return {-a.x, -a.y};
-}
-
-template <typename ArithT>
-TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 3>& a) noexcept -> Vec<decltype(-a.x), 3> {
-  return {-a.x, -a.y, -a.z};
-}
-
-template <typename ArithT>
-TPH_NODISCARD constexpr auto operator-(const Vec<ArithT, 4>& a) noexcept -> Vec<decltype(-a.x), 4> {
-  return {-a.x, -a.y, -a.z, -a.w};
 }
 
 namespace tph_linalg_internal {
@@ -467,6 +487,24 @@ MakeMat4x4(const ArithT a, const ArithT b, const ArithT c, const ArithT d,
 }
 // clang-format on
 
+// Return a row from a matrix.
+template <typename ArithT, int M, int N>
+TPH_NODISCARD constexpr auto Row(const Mat<ArithT, M, N>& a, const int i) noexcept
+    -> Vec<ArithT, N> {
+  if constexpr (N == 2) {
+    return {Comp(a.x, i), Comp(a.y, i)};
+  }
+  else if constexpr (N == 3) {
+    return {Comp(a.x, i), Comp(a.y, i), Comp(a.z, i)};
+  }
+  else if constexpr (N == 4) {
+    return {Comp(a.x, i), Comp(a.y, i), Comp(a.z, i), Comp(a.w, i)};
+  }
+  else {
+    static_assert(tph_linalg_internal::dependent_false<ArithT>::value, "");
+  }
+}
+
 // Identity.
 template <typename ArithT>
 TPH_NODISCARD constexpr auto Identity2x2() noexcept -> Mat<ArithT, 2, 2> {
@@ -502,19 +540,43 @@ TPH_NODISCARD constexpr auto Identity4x4() noexcept -> Mat<ArithT, 4, 4> {
 }
 
 // Matrix/vector multiplication.
-template <class ArithT, int M>
+template <typename ArithT, int M>
 constexpr auto Mul(const Mat<ArithT, M, 2>& a, const Vec<ArithT, 2>& b) noexcept -> Vec<ArithT, M> {
   return a.x * b.x + a.y * b.y;
 }
 
-template <class ArithT, int M>
+template <typename ArithT, int M>
 constexpr auto Mul(const Mat<ArithT, M, 3>& a, const Vec<ArithT, 3>& b) noexcept -> Vec<ArithT, M> {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-template <class ArithT, int M>
+template <typename ArithT, int M>
 constexpr auto Mul(const Mat<ArithT, M, 4>& a, const Vec<ArithT, 4>& b) noexcept -> Vec<ArithT, M> {
   return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}
+
+// template <typename ArithT, int M, int N>
+// constexpr auto Mul(const Mat<ArithT, M, N>& a, const Mat<ArithT, N, 1>& b) noexcept
+//     -> Mat<ArithT, M, 1> {
+//   return {Mul(a, b.x)};
+// }
+
+template <typename ArithT, int M, int N>
+constexpr auto Mul(const Mat<ArithT, M, N>& a, const Mat<ArithT, N, 2>& b) noexcept
+    -> Mat<ArithT, M, 2> {
+  return {Mul(a, b.x), Mul(a, b.y)};
+}
+
+template <typename ArithT, int M, int N>
+constexpr auto mul(const Mat<ArithT, M, N>& a, const Mat<ArithT, N, 3>& b) noexcept
+    -> Mat<ArithT, M, 3> {
+  return {Mul(a, b.x), Mul(a, b.y), Mul(a, b.z)};
+}
+
+template <typename ArithT, int M, int N>
+constexpr auto Mul(const Mat<ArithT, M, N>& a, const Mat<ArithT, N, 4>& b) noexcept
+    -> Mat<ArithT, M, 4> {
+  return {mul(a, b.x), mul(a, b.y), mul(a, b.z), mul(a, b.w)};
 }
 
 } // namespace tph
